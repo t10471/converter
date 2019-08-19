@@ -24,6 +24,12 @@ type FieldSource struct {
 	BaseTypeName    string
 	Refs            []string
 	IsSlice         bool
+	SliceInfo       SliceInfo
+}
+
+type SliceInfo struct {
+	HasSliceCount  bool
+	SliceCountName string
 }
 
 type importDef struct {
@@ -167,6 +173,13 @@ func (ss *structureSource) parseTag(fi *ast.Field, f *FieldSource) (*FieldSource
 	t, err = tags.Get("ref")
 	if err == nil {
 		f.Refs = strings.Split(t.Value(), ",")
+	}
+	if f.IsSlice {
+		if t, err = tags.Get("count"); err != nil {
+			f.SliceInfo = SliceInfo{false, ""}
+		} else {
+			f.SliceInfo = SliceInfo{true, t.Value()}
+		}
 	}
 	return f, nil
 }

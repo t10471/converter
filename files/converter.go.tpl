@@ -58,6 +58,11 @@ func (cv *{{ .Name }}Converter) ConvertFrom(original {{ .Name }}) error {
 
 	{{- if eq .IsSlice true }}
 	for i, x := range original.{{ .Name }} {
+		{{- if eq .SliceInfo.HasSliceCount true }}
+		if i >= int(original.{{ .SliceInfo.SliceCountName }}) {
+			continue
+		}
+		{{- end}}
 		err = cv.{{ .Name }}[i].ConvertFrom(x)
 		if err != nil {
 			return err
@@ -105,7 +110,17 @@ func (cv *{{ .Name }}Converter) ToOriginal() ({{ .Name }}, error) {
 {{- range .FieldSources }}
 
 	{{- if eq .IsSlice true }}
+
+		{{- if eq .SliceInfo.HasSliceCount true }}
+	original.{{ .Name }} = make([]{{ .TypeStr }}, int(original.{{ .SliceInfo.SliceCountName }}))
 	for i, x := range cv.{{ .Name }} {
+		if i >= int(original.{{ .SliceInfo.SliceCountName }}) {
+			continue
+		}
+		{{- else}}
+	original.{{ .Name }} = make([]{{ .TypeStr }}, {{ .Length }})
+	for i, x := range cv.{{ .Name }} {
+		{{- end}}
 		original.{{ .Name }}[i], err = x.ToOriginal()
 		if err != nil {
 			return {{ $orignalName }}{}, err
