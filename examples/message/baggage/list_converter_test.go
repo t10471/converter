@@ -472,7 +472,12 @@ func Test_encodeListPackedDecimal7(t *testing.T) {
 		want    [7]byte
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			"OK",
+			args{predefine.PackedDecimal(1500)},
+			[7]byte{0x00, 0x00, 0x00, 0x00, 0x01, 0x50, 0x0c},
+			false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -497,7 +502,11 @@ func Test_decodeListPackedDecimal7(t *testing.T) {
 		args args
 		want predefine.PackedDecimal
 	}{
-		// TODO: Add test cases.
+		{
+			"OK",
+			args{[7]byte{0x00, 0x00, 0x00, 0x00, 0x01, 0x50, 0x0c}},
+			predefine.PackedDecimal(1500),
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
