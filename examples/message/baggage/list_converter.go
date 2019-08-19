@@ -39,6 +39,9 @@ func (cv *ListConverter) ConvertFrom(original List) error {
 	cv.Name = encodeListEbcdic7(original.Name)
 	cv.PlantaeCount = encodeListHex2(original.PlantaeCount)
 	for i, x := range original.PlantaeList {
+		if i >= int(original.PlantaeCount) {
+			continue
+		}
 		err = cv.PlantaeList[i].ConvertFrom(x)
 		if err != nil {
 			return err
@@ -46,6 +49,9 @@ func (cv *ListConverter) ConvertFrom(original List) error {
 	}
 	cv.AnimaliaCount = encodeListHex2(original.AnimaliaCount)
 	for i, x := range original.AnimaliaList {
+		if i >= int(original.AnimaliaCount) {
+			continue
+		}
 		err = cv.AnimaliaList[i].ConvertFrom(x)
 		if err != nil {
 			return err
@@ -62,14 +68,22 @@ func (cv *ListConverter) ToOriginal() (List, error) {
 	original := List{}
 	original.Name = decodeListEbcdic7(cv.Name)
 	original.PlantaeCount = decodeListHex2(cv.PlantaeCount)
+	original.PlantaeList = make([]creature.Plantae, int(original.PlantaeCount))
 	for i, x := range cv.PlantaeList {
+		if i >= int(original.PlantaeCount) {
+			continue
+		}
 		original.PlantaeList[i], err = x.ToOriginal()
 		if err != nil {
 			return List{}, err
 		}
 	}
 	original.AnimaliaCount = decodeListHex2(cv.AnimaliaCount)
+	original.AnimaliaList = make([]creature.Animalia, int(original.AnimaliaCount))
 	for i, x := range cv.AnimaliaList {
+		if i >= int(original.AnimaliaCount) {
+			continue
+		}
 		original.AnimaliaList[i], err = x.ToOriginal()
 		if err != nil {
 			return List{}, err
